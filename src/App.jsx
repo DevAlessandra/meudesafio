@@ -13,7 +13,8 @@ function App() {
 
   // Função para buscar transações
   function buscarTransacoes() {
-    fetch("http://localhost:3000/transacoes")
+    fetch(`${import.meta.env.VITE_API_URL}/transacoes`)
+
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
