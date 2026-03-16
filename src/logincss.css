@@ -1,66 +1,87 @@
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-   
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .login-container {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  text-align: center;
-  width: 350px;
-  animation: fadeIn 1s ease;
- background:linear-gradient(135deg,#f1f096,#9f44ff);
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3f4f7, #e9ecf9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.login-container h1 {
-  margin-bottom: 1rem;
-  color: #333;
+.hero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  max-width: 1100px;
+  width: 100%;
+  padding: 40px;
+  gap: 40px;
 }
 
-.login-img {
-  max-width: 200px;
-  margin: 20px auto;
-  display: block;
+.hero-text {
+  flex: 1;
+}
+
+.hero-text h1 {
+  font-size: 2.2rem;
+  color: #2c2c2c;
+  margin-bottom: 15px;
+}
+
+.hero-text p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 25px;
 }
 
 .login-form {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .login-form input {
-  padding: 10px;
-  border: 1px solid #ddd;
+  flex: 1;
+  padding: 12px;
   border-radius: 8px;
-  font-size: 1rem;
+  border: 1px solid #ccc;
+  font-size: 14px;
 }
 
 .login-form button {
-    background: linear-gradient(135deg,#eee7ce,#685a1d);
-  color: #fff;
+  background: #00a86b;
+  color: white;
   border: none;
-  padding: 10px;
+  padding: 12px 20px;
   border-radius: 8px;
-  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: 0.2s;
 }
 
 .login-form button:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
+  background: #007f50;
 }
 
-/* Animação suave */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.hero-image {
+  flex: 1;
+}
+
+.hero-image img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .login-form {
+    flex-direction: column;
+  }
+
+  .login-form button {
+    width: 100%;
+  }
 }
