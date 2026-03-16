@@ -132,13 +132,17 @@ gap:12px;
 color:#333
 }
 
-.card-retangulo{
-background:white;
-padding:15px;
-border-radius:12px;
-box-shadow:0 3px 10px rgba(0,0,0,0.08);
-transition:.2s;
+.card-retangulo {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column; /* empilha os elementos */
+  gap: 10px;               /* espaço entre eles */
 }
+
 
 .card-retangulo:hover{
 transform:translateY(-3px);
@@ -158,13 +162,39 @@ color:#777;
 margin-top:6px;
 }
 
-.delete{
-margin-top:8px;
-background:#e53935;
-color:white;
-border:none;
-padding:5px 10px;
-border-radius:6px;
-font-size:12px;
-cursor:pointer;
+.delete {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  align-self: flex-end;     /* alinha à direita */
+  margin-top: 10px;         /* espaço acima */
+}
+
+.delete:hover {
+  background: #c62828;
+}
+
+@media (min-width:768px){
+
+.dashboard{
+max-width:auto;
+margin:auto;
+}
+
+.resumo-financeiro{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+}
+
 }

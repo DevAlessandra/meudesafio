@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./logincss.css";
-import organizeImg from "/organizze.jpg";
+import organizeImg from "/Imagem.png";
 
 function Login({ onLogin }) {
   const [nome, setNome] = useState("");

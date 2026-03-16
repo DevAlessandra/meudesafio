@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Login from "./Login";
 import "./App.css";
+import Grafico from "./Grafico";
 
 function App() {
   const [transacoes, setTransacoes] = useState([]);
@@ -27,6 +28,7 @@ function App() {
         setTransacoes([]);
       });
   }
+  
 
   useEffect(() => {
     buscarTransacoes();
@@ -107,6 +109,7 @@ return (
         </div>
       </div>
 
+    
      
       {/* Formulário */}
       <form onSubmit={criarTransacao} className="formulario">
@@ -160,7 +163,9 @@ return (
                 <span>{t.tipo === "entrada" ? "💰 Receita" : "💸 Despesa"}</span>
                 <span>{new Date(t.data).toLocaleDateString("pt-BR")}</span>
               </div>
-
+            <span>
+           
+            </span>
               <button
                 className="delete"
                 onClick={() => deletarTransacao(t.id)}
@@ -172,11 +177,12 @@ return (
           ))}
         </div>
 
-      </div>
+      </div><Grafico transacoes={transacoes} />
 
     </div>
 
   </div>
+  
 );
 }
 
