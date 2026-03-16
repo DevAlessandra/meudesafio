@@ -16,7 +16,7 @@ flex-direction:column;
 
 .header{
 padding:25px 20px;
-background:linear-gradient(135deg,#f1f096,#9f44ff);
+background: linear-gradient(135deg, #f3f4f7, #e9ecf9);
 color:white;
 border-bottom-left-radius:25px;
 border-bottom-right-radius:25px;
@@ -25,13 +25,14 @@ border-bottom-right-radius:25px;
 .header h1{
 margin:0;
 font-size:22px;
+color:#333
 }
 
 .header h2{
 margin-top:5px;
 font-size:16px;
-font-weight:400;
-color:#333
+font-weight:800;
+color:#d83810
 }
 
 /* SALDO PRINCIPAL */
@@ -85,18 +86,35 @@ color:white;
 
 /* FORMULÁRIO */
 
-.formulario{
-padding:20px;
-display:flex;
-flex-direction:column;
-gap:10px;
+.formulario {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.input-padrao{
-padding:12px;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:14px;
+
+/* Estilo padrão dos inputs */
+.input-padrao {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+/* Botão */
+.btn-adicionar {
+  background: #7b2ff7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-adicionar:hover {
+  transform: scale(1.02);
 }
 
 .btn-adicionar{
@@ -197,4 +215,23 @@ grid-template-columns:repeat(2,1fr);
 gap:15px;
 }
 
+}
+/* Layout horizontal no desktop */
+@media (min-width: 768px) {
+  .formulario {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .input-padrao {
+    flex: 1 1 180px; /* largura mínima e flexível */
+    max-width: 220px;
+  }
+
+  .btn-adicionar {
+    flex: 0 0 auto;
+    margin-top: 0;
+  }
 }
