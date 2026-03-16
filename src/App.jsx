@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Login from "./Login";
-
 import "./App.css";
 
 function App() {
@@ -14,7 +13,6 @@ function App() {
   // Função para buscar transações
   function buscarTransacoes() {
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`)
-
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -34,34 +32,40 @@ function App() {
     buscarTransacoes();
   }, []);
 
+  // Criar transação
   function criarTransacao(e) {
     e.preventDefault();
 
-    fetch("http://localhost:3000/transacoes", {
+    fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         descricao,
         valor: Number(valor),
         tipo,
-        data
+        data,
+      }),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        buscarTransacoes();
+        setDescricao("");
+        setValor("");
+        setData("");
       })
-    }).then(() => {
-      buscarTransacoes();
-      setDescricao("");
-      setValor("");
-      setData("");
-    });
+      .catch((err) => console.error("Erro ao criar transação:", err));
   }
 
+  // Deletar transação
   function deletarTransacao(id) {
-    fetch(`http://localhost:3000/transacoes/${id}`, {
-      method: "DELETE"
-    }).then(() => {
-      buscarTransacoes();
-    });
+    fetch(`${import.meta.env.VITE_API_URL}/transacoes/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => buscarTransacoes())
+      .catch((err) => console.error("Erro ao deletar transação:", err));
   }
 
+  // Cálculos
   const entradas = transacoes
     .filter((t) => t.tipo === "entrada")
     .reduce((total, t) => total + Number(t.valor), 0);
@@ -72,14 +76,14 @@ function App() {
 
   const saldo = entradas - saidas;
 
-  // 🔑 Aqui está a lógica correta
+  // Tela de login
   if (!usuario) {
     return <Login onLogin={setUsuario} />;
   }
 
   return (
     <div className="dashboard">
-      <h1>💰Organizze</h1>
+      <h1>💰 Organizze</h1>
       <h2>Olá, {usuario}!</h2>
 
       {/* Resumo financeiro */}
@@ -144,7 +148,10 @@ function App() {
               <span>{t.tipo === "entrada" ? "💰 Receita" : "💸 Despesa"}</span>
               <span>📅 {new Date(t.data).toLocaleDateString("pt-BR")}</span>
             </div>
-            <button className="delete" onClick={() => deletarTransacao(t.id)}>
+            <button
+              className="delete"
+              onClick={() => deletarTransacao(t.id)}
+            >
               Excluir
             </button>
           </div>
