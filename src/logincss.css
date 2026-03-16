@@ -16,7 +16,7 @@ body {
   text-align: center;
   width: 350px;
   animation: fadeIn 1s ease;
-   background: linear-gradient(135deg,#eee7ce,#f5e6a3);
+ background:linear-gradient(135deg,#f1f096,#9f44ff);
 }
 
 .login-container h1 {
