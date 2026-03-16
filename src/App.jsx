@@ -81,27 +81,33 @@ function App() {
     return <Login onLogin={setUsuario} />;
   }
 
-  return (
-    <div className="dashboard">
+return (
+  <div className="dashboard">
+
+    {/* CABEÇALHO FIXO */}
+    <div className="header">
+
       <h1>💰 Organizze</h1>
       <h2>Olá, {usuario}!</h2>
 
-      {/* Resumo financeiro */}
       <div className="resumo-financeiro">
         <div className="resumo-card entrada">
-          <span className="titulo">Receita</span>
-          <strong className="valor">R$ {entradas}</strong>
+          <span>Receita</span>
+          <strong>R$ {entradas}</strong>
         </div>
+
         <div className="resumo-card saida">
-          <span className="titulo">Despesa</span>
-          <strong className="valor">R$ {saidas}</strong>
+          <span>Despesa</span>
+          <strong>R$ {saidas}</strong>
         </div>
+
         <div className="resumo-card saldo">
-          <span className="titulo">Saldo geral</span>
-          <strong className="valor">R$ {saldo}</strong>
+          <span>Saldo</span>
+          <strong>R$ {saldo}</strong>
         </div>
       </div>
 
+     
       {/* Formulário */}
       <form onSubmit={criarTransacao} className="formulario">
         <input
@@ -136,29 +142,44 @@ function App() {
       </form>
 
       {/* Lista de transações */}
-      <h2>Minhas transações</h2>
-      <div className="cards">
-        {transacoes.map((t) => (
-          <div className={`card-retangulo ${t.tipo}`} key={t.id}>
-            <div className="info-principal">
-              <span className="descricao">{t.descricao}</span>
-              <span className="valor">R$ {t.valor}</span>
+      {/* LISTA COM SCROLL */}
+      <div className="lista-transacoes">
+
+        <h2>Minhas transações</h2>
+
+        <div className="cards">
+          {transacoes.map((t) => (
+            <div className={`card-retangulo ${t.tipo}`} key={t.id}>
+
+              <div className="info-principal">
+                <span>{t.descricao}</span>
+                <span className="valor">R$ {t.valor}</span>
+              </div>
+
+              <div className="info-secundaria">
+                <span>{t.tipo === "entrada" ? "💰 Receita" : "💸 Despesa"}</span>
+                <span>{new Date(t.data).toLocaleDateString("pt-BR")}</span>
+              </div>
+
+              <button
+                className="delete"
+                onClick={() => deletarTransacao(t.id)}
+              >
+                Excluir
+              </button>
+
             </div>
-            <div className="info-secundaria">
-              <span>{t.tipo === "entrada" ? "💰 Receita" : "💸 Despesa"}</span>
-              <span>📅 {new Date(t.data).toLocaleDateString("pt-BR")}</span>
-            </div>
-            <button
-              className="delete"
-              onClick={() => deletarTransacao(t.id)}
-            >
-              Excluir
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
+
       </div>
+
     </div>
-  );
+
+  </div>
+);
 }
+
+
 
 export default App;
