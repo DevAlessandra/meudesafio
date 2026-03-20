@@ -1,67 +1,59 @@
-import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "./context/AuthContext";
+import { useState } from "react";
 import "./logincss.css";
 
-function Login() {
+function Cadastro() {
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    setLoading(true);
-
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch("http://localhost:3000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, senha }),
+        body: JSON.stringify({ nome, email, senha }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // 🔥 salva token + usuário no contexto
-        login(data);
-
-        // 🚀 redireciona sem reload
-        navigate("/");
+        alert("Conta criada com sucesso!");
+        window.location.href = "/login";
       } else {
-        alert(data.erro || "Erro ao fazer login");
+        alert(data.erro || "Erro ao cadastrar");
       }
     } catch (error) {
-      console.error("Erro no login:", error);
+      console.error(error);
       alert("Erro ao conectar com o servidor");
-    } finally {
-      setLoading(false);
     }
   }
 
   return (
     <div className="login-container">
+      {/* Cabeçalho estilo landing page */}
       <header className="hero">
-        
-        {/* TEXTO */}
         <div className="hero-text">
-          <h1>💰 Organizze</h1>
-          <h2>Bem-vindo de volta</h2>
-          <p>Acesse sua conta e continue cuidando das suas finanças.</p>
+          <h1> 💰 Organizze</h1>
+          <h2>Crie sua conta</h2>
+          <p>Comece agora a organizar sua vida financeira.</p>
 
           <form onSubmit={handleSubmit} className="login-form">
-            
+            <input
+              type="text"
+              placeholder="Seu nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
+
             <input
               type="email"
               placeholder="Seu email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
 
             <input
@@ -69,29 +61,23 @@ function Login() {
               placeholder="Sua senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              required
             />
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
-
+            <button type="submit">Criar conta</button>
           </form>
 
           <p style={{ marginTop: "10px" }}>
-            Não tem conta?{" "}
-            <Link to="/cadastro">Criar conta</Link>
+            Já tem conta? <a href="/login">Entrar</a>
           </p>
         </div>
 
-        {/* IMAGEM */}
         <div className="hero-image">
           <img src="/Imagem.png" alt="Controle financeiro moderno" />
         </div>
-
       </header>
     </div>
   );
 }
 
-export default Login;
+
+export default Cadastro;

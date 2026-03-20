@@ -3,69 +3,145 @@ dotenv.config();
 import process from "process";
 import express from "express";
 import cors from "cors";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import pool from "./db.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// habilita CORS para qualquer origem
 app.use(cors());
-
-// permite receber JSON
 app.use(express.json());
 
-// Middleware de validação
-function validarTransacao(req, res, next) {
-  const { descricao, valor, tipo } = req.body;
+// 🔐 Middleware de autenticação (MELHORADO)
+function autenticar(req, res, next) {
+  let token = req.headers.authorization;
 
-  if (!descricao || descricao.length < 3) {
-    return res.status(400).json({
-      mensagem: "Descrição deve ter no mínimo 3 caracteres",
-    });
+  if (!token) {
+    return res.status(401).json({ erro: "Token não fornecido" });
   }
 
-  if (typeof valor !== "number" || valor <= 0) {
-    return res.status(400).json({
-      mensagem: "Valor deve ser um número maior que 0",
-    });
+  // 👉 remove "Bearer "
+  if (token.startsWith("Bearer ")) {
+    token = token.split(" ")[1];
   }
 
-  if (tipo !== "entrada" && tipo !== "saida") {
-    return res.status(400).json({
-      mensagem: "Tipo deve ser 'entrada' ou 'saida'",
-    });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.usuarioId = decoded.id;
+    next();
+  } catch (err) {
+    console.error("ERRO NA AUTENTICAÇÃO:", err);
+    return res.status(401).json({ erro: "Token inválido" });
   }
-
-  next();
 }
 
-// ROTA INICIAL
-app.get("/", (req, res) => {
-  res.send("API Controle Financeiro");
+// ✅ Cadastro (VALIDADO)
+app.post("/register", async (req, res) => {
+  const { nome, email, senha } = req.body;
+
+  if (!nome || !email || !senha) {
+    return res.status(400).json({ erro: "Preencha todos os campos" });
+  }
+
+  try {
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    const result = await pool.query(
+      "INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3) RETURNING id, nome, email",
+      [nome, email, senhaHash]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("ERRO NO REGISTER:", err);
+
+    if (err.code === "23505") {
+      return res.status(400).json({ erro: "Email já cadastrado" });
+    }
+
+    res.status(500).json({ erro: "Erro ao cadastrar usuário" });
+  }
 });
 
-// LISTAR TRANSAÇÕES
-app.get("/transacoes", async (req, res) => {
+// 🔑 Login (RETORNANDO USUÁRIO)
+app.post("/login", async (req, res) => {
+  const { email, senha } = req.body;
+
   try {
-    const resultado = await pool.query("SELECT * FROM transacoes ORDER BY id DESC");
+    const user = await pool.query(
+      "SELECT * FROM usuarios WHERE email = $1",
+      [email]
+    );
+
+    if (user.rows.length === 0) {
+      return res.status(401).json({ erro: "Usuário não encontrado" });
+    }
+
+    const usuario = user.rows[0];
+
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaValida) {
+      return res.status(401).json({ erro: "Senha inválida" });
+    }
+
+    const token = jwt.sign(
+      { id: usuario.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // 🔥 AGORA ENVIA DADOS DO USUÁRIO
+    res.json({
+      token,
+      usuario: {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+      },
+    });
+  } catch (err) {
+    console.error("ERRO NO LOGIN:", err);
+    res.status(500).json({ erro: "Erro ao fazer login" });
+  }
+});
+
+// 📌 ROTA INICIAL
+app.get("/", (req, res) => {
+  res.send("API Controle Financeiro com autenticação 🔐");
+});
+
+// 📊 LISTAR TRANSAÇÕES
+app.get("/transacoes", autenticar, async (req, res) => {
+     console.log("Usuario ID:", req.usuarioId);
+  try {
+    const resultado = await pool.query(
+      "SELECT * FROM transacoes WHERE usuario_id = $1 ORDER BY id DESC",
+      [req.usuarioId]
+    );
+
     res.json(resultado.rows);
   } catch (erro) {
     console.error("ERRO NO BANCO:", erro);
-    res.status(500).json({
-      mensagem: "Erro ao listar transações",
-      erro: erro.message,
-    });
+    res.status(500).json({ erro: "Erro ao listar transações" });
   }
 });
 
-// CRIAR TRANSAÇÃO
-app.post("/transacoes", validarTransacao, async (req, res) => {
+// ➕ CRIAR
+app.post("/transacoes", autenticar, async (req, res) => {
   const { descricao, data, valor, tipo } = req.body;
+
+  if (!descricao || !valor || !tipo) {
+    return res.status(400).json({ erro: "Dados inválidos" });
+  }
+
   try {
     const result = await pool.query(
-      "INSERT INTO transacoes (descricao, data, valor, tipo) VALUES ($1, $2, $3, $4) RETURNING *",
-      [descricao, data, valor, tipo]
+      "INSERT INTO transacoes (descricao, data, valor, tipo, usuario_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [descricao, data, valor, tipo, req.usuarioId]
     );
+
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -73,33 +149,38 @@ app.post("/transacoes", validarTransacao, async (req, res) => {
   }
 });
 
-// ATUALIZAR TRANSAÇÃO
-app.put("/transacoes/:id", validarTransacao, async (req, res) => {
+// ✏️ ATUALIZAR
+app.put("/transacoes/:id", autenticar, async (req, res) => {
   const { id } = req.params;
   const { descricao, valor, tipo, data } = req.body;
 
   try {
     const result = await pool.query(
-      "UPDATE transacoes SET descricao=$1, valor=$2, tipo=$3, data=$4 WHERE id=$5 RETURNING *",
-      [descricao, valor, tipo, data, id]
+      "UPDATE transacoes SET descricao=$1, valor=$2, tipo=$3, data=$4 WHERE id=$5 AND usuario_id=$6 RETURNING *",
+      [descricao, valor, tipo, data, id, req.usuarioId]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ mensagem: "Transação não encontrada" });
+      return res.status(404).json({ erro: "Transação não encontrada" });
     }
 
-    res.json({ mensagem: "Transação atualizada", transacao: result.rows[0] });
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro ao atualizar transação");
   }
 });
 
-// EXCLUIR TRANSAÇÃO
-app.delete("/transacoes/:id", async (req, res) => {
+// ❌ EXCLUIR
+app.delete("/transacoes/:id", autenticar, async (req, res) => {
   const { id } = req.params;
+
   try {
-    await pool.query("DELETE FROM transacoes WHERE id = $1", [id]);
+    await pool.query(
+      "DELETE FROM transacoes WHERE id = $1 AND usuario_id = $2",
+      [id, req.usuarioId]
+    );
+
     res.sendStatus(204);
   } catch (err) {
     console.error(err);
@@ -107,22 +188,33 @@ app.delete("/transacoes/:id", async (req, res) => {
   }
 });
 
-// CALCULAR SALDO
-app.get("/saldo", async (req, res) => {
+// 💰 SALDO
+app.get("/saldo", autenticar, async (req, res) => {
   try {
-    const entradas = await pool.query("SELECT COALESCE(SUM(valor),0) AS total FROM transacoes WHERE tipo='entrada'");
-    const saidas = await pool.query("SELECT COALESCE(SUM(valor),0) AS total FROM transacoes WHERE tipo='saida'");
+    const entradas = await pool.query(
+      "SELECT COALESCE(SUM(valor),0) AS total FROM transacoes WHERE tipo='entrada' AND usuario_id=$1",
+      [req.usuarioId]
+    );
 
-    const saldo = Number(entradas.rows[0].total) - Number(saidas.rows[0].total);
+    const saidas = await pool.query(
+      "SELECT COALESCE(SUM(valor),0) AS total FROM transacoes WHERE tipo='saida' AND usuario_id=$1",
+      [req.usuarioId]
+    );
+
+    const saldo =
+      Number(entradas.rows[0].total) -
+      Number(saidas.rows[0].total);
 
     res.json({ saldo });
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro ao calcular saldo");
   }
+  console.log("Usuario ID:", req.usuarioId);
+  console.log("DB:", process.env.DATABASE_URL);
 });
 
-// SERVIDOR
+// 🚀 SERVIDOR
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

@@ -1,186 +1,31 @@
-import { useState, useEffect } from "react";
-import Login from "./Login";
-import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 
+import Login from "./Login";
+import Cadastro from "./Cadastro";
+import Dashboard from "./Dashboard";
 
 function App() {
-  const [transacoes, setTransacoes] = useState([]);
-  const [descricao, setDescricao] = useState("");
-  const [data, setData] = useState("");
-  const [valor, setValor] = useState("");
-  const [tipo, setTipo] = useState("entrada");
-  const [usuario, setUsuario] = useState(null);
+  const { token } = useContext(AuthContext);
 
-  // Função para buscar transações
-  function buscarTransacoes() {
-    fetch(`${import.meta.env.VITE_API_URL}/transacoes`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setTransacoes(data);
-        } else {
-          console.error("Resposta inesperada:", data);
-          setTransacoes([]);
-        }
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar transações:", err);
-        setTransacoes([]);
-      });
-  }
-  
-
-  useEffect(() => {
-    buscarTransacoes();
-  }, []);
-
-  // Criar transação
-  function criarTransacao(e) {
-    e.preventDefault();
-
-    fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        descricao,
-        valor: Number(valor),
-        tipo,
-        data,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        buscarTransacoes();
-        setDescricao("");
-        setValor("");
-        setData("");
-      })
-      .catch((err) => console.error("Erro ao criar transação:", err));
-  }
-
-  // Deletar transação
-  function deletarTransacao(id) {
-    fetch(`${import.meta.env.VITE_API_URL}/transacoes/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => buscarTransacoes())
-      .catch((err) => console.error("Erro ao deletar transação:", err));
-  }
-
-  // Cálculos
-  const entradas = transacoes
-    .filter((t) => t.tipo === "entrada")
-    .reduce((total, t) => total + Number(t.valor), 0);
-
-  const saidas = transacoes
-    .filter((t) => t.tipo === "saida")
-    .reduce((total, t) => total + Number(t.valor), 0);
-
-  const saldo = entradas - saidas;
-
-  // Tela de login
-  if (!usuario) {
-    return <Login onLogin={setUsuario} />;
-  }
-
-return (
-  <div className="dashboard">
-
-    {/* CABEÇALHO FIXO */}
-    <div className="header">
-
-      <h1>💰 Organizze</h1>
-      <h2>Olá, {usuario}!</h2>
-
-      <div className="resumo-financeiro">
-        <div className="resumo-card entrada">
-          <span>Receita</span>
-          <strong>R$ {entradas}</strong>
-        </div>
-
-        <div className="resumo-card saida">
-          <span>Despesa</span>
-          <strong>R$ {saidas}</strong>
-        </div>
-
-        <div className="resumo-card saldo">
-          <span>Saldo</span>
-          <strong>R$ {saldo}</strong>
-        </div>
-      </div>
-
-    
-     
-      {/* Formulário */}
-      <form onSubmit={criarTransacao} className="formulario">
-        <input
-          type="text"
-          placeholder="Descrição"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          className="input-padrao"
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={token ? <Dashboard /> : <Navigate to="/login" />}
         />
-        <input
-          type="date"
-          value={data}
-          onChange={(e) => setData(e.target.value)}
-          className="input-padrao"
+
+        <Route
+          path="/login"
+          element={!token ? <Login /> : <Navigate to="/" />}
         />
-        <input
-          type="number"
-          placeholder="Valor"
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-          className="input-padrao"
-        />
-        <select
-          value={tipo}
-          onChange={(e) => setTipo(e.target.value)}
-          className="input-padrao"
-        >
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
-        </select>
-        <button className="btn-adicionar">Adicionar</button>
-      </form>
 
-      {/* Lista de transações */}
-      {/* LISTA COM SCROLL */}
-      <div className="lista-transacoes">
-
-        <h2>Minhas transações</h2>
-
-        <div className="cards">
-          {transacoes.map((t) => (
-            <div className={`card-retangulo ${t.tipo}`} key={t.id}>
-
-              <div className="info-principal">
-                <span>{t.descricao}</span>
-                <span className="valor">R$ {t.valor}</span>
-              </div>
-
-              <div className="info-secundaria">
-                <span>{t.tipo === "entrada" ? "💰 Receita" : "💸 Despesa"}</span>
-                <span>{new Date(t.data).toLocaleDateString("pt-BR")}</span>
-              </div>
-
-              <button
-                className="delete"
-                onClick={() => deletarTransacao(t.id)}
-              >
-                Excluir
-              </button>
-
-            </div>
-          ))}
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-  
-);
+        <Route path="/cadastro" element={<Cadastro />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
