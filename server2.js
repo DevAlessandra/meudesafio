@@ -129,8 +129,6 @@ app.post("/login", async (req, res) => {
 ========================= */
 app.get("/transacoes", autenticar, async (req, res) => {
   try {
-    console.log("Usuario ID:", req.usuarioId);
-
     const resultado = await pool.query(
       "SELECT * FROM transacoes WHERE usuario_id = $1 ORDER BY id DESC",
       [req.usuarioId]
@@ -138,8 +136,8 @@ app.get("/transacoes", autenticar, async (req, res) => {
 
     res.json(resultado.rows);
   } catch (erro) {
-    console.error("ERRO NO BANCO:", erro);
-    res.status(500).json({ erro: erro.message });
+    console.error("ERRO REAL:", erro);
+    res.status(500).json({ erro: erro.message }); // 👈 ESSENCIAL
   }
 });
 
