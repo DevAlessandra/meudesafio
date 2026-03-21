@@ -1,24 +1,24 @@
-import { createContext, useState, useEffect } from "react";
+import {  useState } from "react";
 
 
-export const AuthContext = createContext(); 
+
+
+function initializeUsuario() {
+  const user = localStorage.getItem("usuario");
+  if (user && user !== "undefined") {
+    try {
+      return JSON.parse(user);
+    } catch (error) {
+      console.error("Erro ao parsear usuário:", error);
+      localStorage.removeItem("usuario");
+    }
+  }
+  return null;
+}
 
 export function AuthProvider({ children }) {
 const [token, setToken] = useState(localStorage.getItem("token"));
-  const [usuario, setUsuario] = useState(null);
-
-  useEffect(() => {
-    const user = localStorage.getItem("usuario");
-
-    if (user && user !== "undefined") {
-      try {
-        setUsuario(JSON.parse(user));
-      } catch (error) {
-        console.error("Erro ao parsear usuário:", error);
-        localStorage.removeItem("usuario");
-      }
-    }
-  }, []);
+  const [usuario, setUsuario] = useState(initializeUsuario());
 
   function login(data) {
     localStorage.setItem("token", data.token);
