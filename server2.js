@@ -10,9 +10,11 @@ import pool from "./db.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
 
+app.use(cors({
+  origin: "https://organizzecontrole.vercel.app",
+  credentials: true,
+}));
 // 🔐 Middleware de autenticação (MELHORADO)
 function autenticar(req, res, next) {
   let token = req.headers.authorization;
