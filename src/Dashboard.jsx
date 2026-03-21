@@ -13,20 +13,22 @@ function Dashboard() {
 
   const token = localStorage.getItem("token");
 
-  // 🔥 HEADER PADRÃO (evita repetir código)
+  // 🔥 HEADER PADRÃO
   const authHeader = {
-   Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   };
 
   /* =========================
      📊 BUSCAR TRANSAÇÕES
   ========================= */
   function buscarTransacoes() {
+    console.log("🔎 Buscando transações...");
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       headers: authHeader,
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("Resposta da API (GET /transacoes):", data);
         if (Array.isArray(data)) {
           setTransacoes(data);
         } else {
@@ -49,21 +51,26 @@ function Dashboard() {
   function criarTransacao(e) {
     e.preventDefault();
 
+    const payload = {
+      descricao,
+      valor: Number(valor),
+      tipo,
+      data,
+    };
+
+    console.log("📤 Enviando nova transação:", payload);
+
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...authHeader,
       },
-      body: JSON.stringify({
-        descricao,
-        valor: Number(valor),
-        tipo,
-        data,
-      }),
+      body: JSON.stringify(payload),
     })
       .then((res) => res.json())
-      .then(() => {
+      .then((novaTransacao) => {
+        console.log("✅ Criada:", novaTransacao);
         buscarTransacoes();
         setDescricao("");
         setValor("");
@@ -78,6 +85,7 @@ function Dashboard() {
      ❌ DELETAR
   ========================= */
   function deletarTransacao(id) {
+    console.log("🗑️ Deletando transação:", id);
     fetch(`${import.meta.env.VITE_API_URL}/transacoes/${id}`, {
       method: "DELETE",
       headers: authHeader,
