@@ -214,6 +214,13 @@ app.get("/saldo", autenticar, async (req, res) => {
   }
   console.log("Usuario ID:", req.usuarioId);
   console.log("DB:", process.env.DATABASE_URL);
+  // =========================
+// TESTE API
+// =========================
+app.get("/", (req, res) => {
+  res.send("API funcionando 🚀");
+});
+
 });
 
 // 🚀 SERVIDOR
