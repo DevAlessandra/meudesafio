@@ -1,38 +1,59 @@
 import { useState, useEffect, useContext } from "react";
-import { AuthContext } from "./context/AuthContext"; // ajuste o caminho
+import { AuthContext } from "./context/AuthContext";
 import "./Dashboard.css";
 
 function Dashboard() {
-  const { usuario, logout } = useContext(AuthContext); // pega o usuário do contexto
+  const { usuario, logout } = useContext(AuthContext);
+
   const [transacoes, setTransacoes] = useState([]);
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
   const [valor, setValor] = useState("");
   const [tipo, setTipo] = useState("entrada");
 
-  const token = localStorage.getItem("token"); // ou poderia vir do contexto também
+  const token = localStorage.getItem("token");
 
+  // 🔥 HEADER PADRÃO (evita repetir código)
+  const authHeader = {
+    Authorization: `Bearer ${token}`,
+  };
+
+  /* =========================
+     📊 BUSCAR TRANSAÇÕES
+  ========================= */
   function buscarTransacoes() {
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
-      headers: { Authorization: token },
+      headers: authHeader,
     })
       .then((res) => res.json())
-      .then((data) => setTransacoes(Array.isArray(data) ? data : []))
-      .catch(console.error);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTransacoes(data);
+        } else {
+          console.error("Erro da API:", data);
+          setTransacoes([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar transações:", err);
+      });
   }
 
   useEffect(() => {
     buscarTransacoes();
   }, []);
 
+  /* =========================
+     ➕ CRIAR TRANSAÇÃO
+  ========================= */
   function criarTransacao(e) {
     e.preventDefault();
 
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       method: "POST",
-            headers: {
+      headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...authHeader,
       },
       body: JSON.stringify({
         descricao,
@@ -40,21 +61,36 @@ function Dashboard() {
         tipo,
         data,
       }),
-    }).then(() => {
-      buscarTransacoes();
-      setDescricao("");
-      setValor("");
-      setData("");
-    });
+    })
+      .then((res) => res.json())
+      .then(() => {
+        buscarTransacoes();
+        setDescricao("");
+        setValor("");
+        setData("");
+      })
+      .catch((err) => {
+        console.error("Erro ao criar transação:", err);
+      });
   }
 
+  /* =========================
+     ❌ DELETAR
+  ========================= */
   function deletarTransacao(id) {
     fetch(`${import.meta.env.VITE_API_URL}/transacoes/${id}`, {
       method: "DELETE",
-      headers: { Authorization: token },
-    }).then(buscarTransacoes);
+      headers: authHeader,
+    })
+      .then(() => buscarTransacoes())
+      .catch((err) => {
+        console.error("Erro ao deletar:", err);
+      });
   }
 
+  /* =========================
+     💰 CÁLCULOS
+  ========================= */
   const entradas = transacoes
     .filter((t) => t.tipo === "entrada")
     .reduce((total, t) => total + Number(t.valor), 0);
@@ -65,11 +101,14 @@ function Dashboard() {
 
   const saldo = entradas - saidas;
 
+  /* =========================
+     🎨 UI
+  ========================= */
   return (
     <div className="dashboard">
       <div className="header">
         <h1>💰 Organizze</h1>
-        {usuario && <p>Olá, {usuario.nome}!</p>} {/* saudação usando o contexto */}
+        {usuario && <p>Olá, {usuario.nome}!</p>}
 
         {/* RESUMO */}
         <div className="resumo-financeiro">
@@ -84,7 +123,7 @@ function Dashboard() {
           </div>
 
           <div className="resumo-card saldo">
-            <span> Saldo Total</span>
+            <span>Saldo Total</span>
             <strong>R$ {saldo}</strong>
           </div>
         </div>
@@ -97,6 +136,7 @@ function Dashboard() {
           placeholder="Descrição"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
+          required
         />
 
         <input
@@ -104,6 +144,7 @@ function Dashboard() {
           type="date"
           value={data}
           onChange={(e) => setData(e.target.value)}
+          required
         />
 
         <input
@@ -111,6 +152,7 @@ function Dashboard() {
           placeholder="Valor"
           value={valor}
           onChange={(e) => setValor(e.target.value)}
+          required
         />
 
         <select
@@ -140,7 +182,10 @@ function Dashboard() {
                 <span>{new Date(t.data).toLocaleDateString()}</span>
               </div>
 
-              <button className="delete" onClick={() => deletarTransacao(t.id)}>
+              <button
+                className="delete"
+                onClick={() => deletarTransacao(t.id)}
+              >
                 Excluir
               </button>
             </div>
