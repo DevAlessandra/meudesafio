@@ -30,9 +30,9 @@ function Dashboard() {
 
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       method: "POST",
-      headers: {
+            headers: {
         "Content-Type": "application/json",
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         descricao,
