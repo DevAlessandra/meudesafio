@@ -33,6 +33,13 @@ body {
   color: #7b2ff7;
 }
 
+.header p {
+  margin-top: 5px;
+  font-size: 25px;
+  font-weight: 700;
+  color: #f73c2f;
+}
+
 /* RESUMO */
 .resumo-financeiro {
   display: flex;
@@ -106,7 +113,7 @@ body {
 }
 
 /* BOTÃO */
-.btn-adicionar {
+.btn-adicionar, .logout {
   background: linear-gradient(135deg, #7b2ff7, #9f44ff);
   color: white;
   border: none;
@@ -116,7 +123,9 @@ body {
   cursor: pointer;
   transition: 0.2s;
 }
-
+.logout{
+  width: 50px;
+}
 .btn-adicionar:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(123,47,247,0.3);
@@ -181,6 +190,8 @@ body {
 .delete:hover {
   background: #c62828;
 }
+
+
 
 /* DESKTOP */
 @media (min-width: 768px) {
