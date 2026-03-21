@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "./context/AuthContext"; // ajuste o caminho
 import "./Dashboard.css";
 
 function Dashboard() {
+  const { usuario, logout } = useContext(AuthContext); // pega o usuário do contexto
   const [transacoes, setTransacoes] = useState([]);
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
   const [valor, setValor] = useState("");
   const [tipo, setTipo] = useState("entrada");
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token"); // ou poderia vir do contexto também
 
   function buscarTransacoes() {
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
@@ -53,11 +55,6 @@ function Dashboard() {
     }).then(buscarTransacoes);
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  }
-
   const entradas = transacoes
     .filter((t) => t.tipo === "entrada")
     .reduce((total, t) => total + Number(t.valor), 0);
@@ -72,9 +69,7 @@ function Dashboard() {
     <div className="dashboard">
       <div className="header">
         <h1>💰 Organizze</h1>
-        <button onClick={logout} className="logout">Sair</button>
-
-        <h2>Saldo: R$ {saldo}</h2>
+        {usuario && <p>Olá, {usuario.nome}!</p>} {/* saudação usando o contexto */}
 
         {/* RESUMO */}
         <div className="resumo-financeiro">
@@ -89,7 +84,7 @@ function Dashboard() {
           </div>
 
           <div className="resumo-card saldo">
-            <span>Total</span>
+            <span> Saldo Total</span>
             <strong>R$ {saldo}</strong>
           </div>
         </div>
@@ -135,7 +130,6 @@ function Dashboard() {
         <div className="cards">
           {transacoes.map((t) => (
             <div key={t.id} className={`card-retangulo ${t.tipo}`}>
-              
               <div className="info-principal">
                 <span>{t.descricao}</span>
                 <span>R$ {t.valor}</span>
@@ -146,17 +140,17 @@ function Dashboard() {
                 <span>{new Date(t.data).toLocaleDateString()}</span>
               </div>
 
-              <button
-                className="delete"
-                onClick={() => deletarTransacao(t.id)}
-              >
+              <button className="delete" onClick={() => deletarTransacao(t.id)}>
                 Excluir
               </button>
-
             </div>
           ))}
         </div>
       </div>
+
+      <button onClick={logout} className="logout">
+        Sair
+      </button>
     </div>
   );
 }
