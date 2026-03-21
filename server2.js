@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import process from "process";
+
 import express from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
@@ -10,12 +10,17 @@ import pool from "./db.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
+// ✅ CORS (Vercel)
 app.use(cors({
   origin: "https://organizzecontrole.vercel.app",
   credentials: true,
 }));
-// 🔐 Middleware de autenticação (MELHORADO)
+
+app.use(express.json());
+
+/* =========================
+   🔐 MIDDLEWARE AUTH
+========================= */
 function autenticar(req, res, next) {
   let token = req.headers.authorization;
 
@@ -23,7 +28,6 @@ function autenticar(req, res, next) {
     return res.status(401).json({ erro: "Token não fornecido" });
   }
 
-  // 👉 remove "Bearer "
   if (token.startsWith("Bearer ")) {
     token = token.split(" ")[1];
   }
@@ -38,7 +42,16 @@ function autenticar(req, res, next) {
   }
 }
 
-// ✅ Cadastro (VALIDADO)
+/* =========================
+   🏠 ROTA INICIAL
+========================= */
+app.get("/", (req, res) => {
+  res.send("API funcionando 🚀");
+});
+
+/* =========================
+   📝 CADASTRO
+========================= */
 app.post("/register", async (req, res) => {
   const { nome, email, senha } = req.body;
 
@@ -66,7 +79,9 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// 🔑 Login (RETORNANDO USUÁRIO)
+/* =========================
+   🔑 LOGIN
+========================= */
 app.post("/login", async (req, res) => {
   const { email, senha } = req.body;
 
@@ -94,7 +109,6 @@ app.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    // 🔥 AGORA ENVIA DADOS DO USUÁRIO
     res.json({
       token,
       usuario: {
@@ -109,15 +123,13 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// 📌 ROTA INICIAL
-app.get("/", (req, res) => {
-  res.send("API Controle Financeiro com autenticação 🔐");
-});
-
-// 📊 LISTAR TRANSAÇÕES
+/* =========================
+   📊 LISTAR TRANSAÇÕES
+========================= */
 app.get("/transacoes", autenticar, async (req, res) => {
-     console.log("Usuario ID:", req.usuarioId);
   try {
+    console.log("Usuario ID:", req.usuarioId);
+
     const resultado = await pool.query(
       "SELECT * FROM transacoes WHERE usuario_id = $1 ORDER BY id DESC",
       [req.usuarioId]
@@ -126,11 +138,13 @@ app.get("/transacoes", autenticar, async (req, res) => {
     res.json(resultado.rows);
   } catch (erro) {
     console.error("ERRO NO BANCO:", erro);
-    res.status(500).json({ erro: "Erro ao listar transações" });
+    res.status(500).json({ erro: erro.message });
   }
 });
 
-// ➕ CRIAR
+/* =========================
+   ➕ CRIAR TRANSAÇÃO
+========================= */
 app.post("/transacoes", autenticar, async (req, res) => {
   const { descricao, data, valor, tipo } = req.body;
 
@@ -144,14 +158,16 @@ app.post("/transacoes", autenticar, async (req, res) => {
       [descricao, data, valor, tipo, req.usuarioId]
     );
 
-    res.json(result.rows[0]);
+    res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro ao adicionar transação");
+    console.error("ERRO AO CRIAR:", err);
+    res.status(500).json({ erro: err.message });
   }
 });
 
-// ✏️ ATUALIZAR
+/* =========================
+   ✏️ ATUALIZAR
+========================= */
 app.put("/transacoes/:id", autenticar, async (req, res) => {
   const { id } = req.params;
   const { descricao, valor, tipo, data } = req.body;
@@ -168,12 +184,14 @@ app.put("/transacoes/:id", autenticar, async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro ao atualizar transação");
+    console.error("ERRO AO ATUALIZAR:", err);
+    res.status(500).json({ erro: err.message });
   }
 });
 
-// ❌ EXCLUIR
+/* =========================
+   ❌ EXCLUIR
+========================= */
 app.delete("/transacoes/:id", autenticar, async (req, res) => {
   const { id } = req.params;
 
@@ -185,12 +203,14 @@ app.delete("/transacoes/:id", autenticar, async (req, res) => {
 
     res.sendStatus(204);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro ao excluir transação");
+    console.error("ERRO AO EXCLUIR:", err);
+    res.status(500).json({ erro: err.message });
   }
 });
 
-// 💰 SALDO
+/* =========================
+   💰 SALDO
+========================= */
 app.get("/saldo", autenticar, async (req, res) => {
   try {
     const entradas = await pool.query(
@@ -209,21 +229,14 @@ app.get("/saldo", autenticar, async (req, res) => {
 
     res.json({ saldo });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro ao calcular saldo");
+    console.error("ERRO NO SALDO:", err);
+    res.status(500).json({ erro: err.message });
   }
-  console.log("Usuario ID:", req.usuarioId);
-  console.log("DB:", process.env.DATABASE_URL);
-  // =========================
-// TESTE API
-// =========================
-app.get("/", (req, res) => {
-  res.send("API funcionando 🚀");
 });
 
-});
-
-// 🚀 SERVIDOR
+/* =========================
+   🚀 START
+========================= */
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
