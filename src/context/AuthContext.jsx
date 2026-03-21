@@ -1,7 +1,7 @@
-import {  useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 
-
+export const AuthContext = createContext(); 
 
 function initializeUsuario() {
   const user = localStorage.getItem("usuario");
