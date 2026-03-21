@@ -15,7 +15,7 @@ function Dashboard() {
 
   // 🔥 HEADER PADRÃO (evita repetir código)
   const authHeader = {
-    Authorization: `Bearer ${token}`,
+   Authorization: `Bearer ${token}`,
   };
 
   /* =========================
