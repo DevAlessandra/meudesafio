@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import process from "process";
+import "./initDb.js";
 
 import express from "express";
 import cors from "cors";
