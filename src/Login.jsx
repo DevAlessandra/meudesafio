@@ -4,7 +4,6 @@ import { AuthContext } from "./context/AuthContext";
 import "./logincss.css";
 
 function Login() {
-  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,12 +17,12 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nome,email, senha }),
+        body: JSON.stringify({ email, senha }),
       });
 
       const data = await res.json();
@@ -56,14 +55,6 @@ function Login() {
           <p>Acesse sua conta e continue cuidando das suas finanças.</p>
 
           <form onSubmit={handleSubmit} className="login-form">
-            <input
-              type="text"
-              placeholder="Seu nome"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-            />
-           
             <input
               type="email"
               placeholder="Seu email"
