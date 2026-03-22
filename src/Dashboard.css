@@ -1,4 +1,4 @@
-D/* RESET */
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -66,8 +66,60 @@ D/* RESET */
   background: #e74c3c;
 }
 
+<<<<<<< HEAD
 .resumo-card.saldo {
   background: #3498db;
+=======
+.saldo {
+  background: linear-gradient(135deg, #7b2ff7, #9f44ff);
+  color: white;
+}
+
+.saldo span,
+.saldo strong {
+  color: white;
+}
+
+/* FORM */
+.formulario {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-padrao {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.input-padrao:focus {
+  border-color: #7b2ff7;
+  outline: none;
+}
+
+/* BOTÃO */
+.btn-adicionar, .logout {
+  background: linear-gradient(135deg, #7b2ff7, #9f44ff);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.logout {
+  margin: 20px;
+  align-self: flex-start;
+}
+.btn-adicionar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(123,47,247,0.3);
+>>>>>>> 5a754a2cc9efe212e6c4d8943e47b128bebc824e
 }
 
 /* LISTA */

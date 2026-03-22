@@ -1,20 +1,20 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 import process from "process";
-import "./initDb.js";
-
 import express from "express";
 import cors from "cors";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "./db.js";
+
+// Run DB initialization after dotenv is loaded
+await import("./initDb.js");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ CORS (permitindo frontend do Vercel)
 app.use(cors({
-  origin: "https://organizzecontrole.vercel.app",
+  origin: process.env.CORS_ORIGIN || "https://organizzecontrole.vercel.app",
   credentials: true,
 }));
 

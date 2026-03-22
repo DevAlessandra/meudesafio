@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      "/login": "http://localhost:3000",
+      "/register": "http://localhost:3000",
       "/transacoes": "http://localhost:3000",
       "/saldo": "http://localhost:3000"
     }
