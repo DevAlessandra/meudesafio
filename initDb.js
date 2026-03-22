@@ -28,6 +28,21 @@ async function initDb() {
       );
     `);
 
+    // Migration: add usuario_id column if it was missing from an older schema
+    await pool.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'transacoes' AND column_name = 'usuario_id'
+        ) THEN
+          ALTER TABLE transacoes
+            ADD COLUMN usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+        END IF;
+      END
+      $$;
+    `);
+
     console.log("Tabelas verificadas/criadas com sucesso");
   } catch (err) {
     console.error("Erro ao inicializar banco:", err.message);
