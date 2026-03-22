@@ -1,6 +1,12 @@
+import process from "process";
 import pool from "./db.js";
 
 async function initDb() {
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL not set. Skipping database initialization.");
+    return;
+  }
+
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS usuarios (
@@ -22,9 +28,9 @@ async function initDb() {
       );
     `);
 
-    console.log("✅ Tabelas verificadas/criadas com sucesso");
+    console.log("Tabelas verificadas/criadas com sucesso");
   } catch (err) {
-    console.error("Erro ao inicializar banco:", err);
+    console.error("Erro ao inicializar banco:", err.message);
   }
 }
 
