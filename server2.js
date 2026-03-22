@@ -12,7 +12,7 @@ import pool from "./db.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS (Vercel)
+// ✅ CORS (permitindo frontend do Vercel)
 app.use(cors({
   origin: "https://organizzecontrole.vercel.app",
   credentials: true,
@@ -138,7 +138,7 @@ app.get("/transacoes", autenticar, async (req, res) => {
     res.json(resultado.rows);
   } catch (erro) {
     console.error("ERRO REAL:", erro);
-    res.status(500).json({ erro: erro.message }); // 👈 ESSENCIAL
+    res.status(500).json({ erro: erro.message });
   }
 });
 
