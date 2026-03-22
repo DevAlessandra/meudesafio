@@ -1,4 +1,4 @@
-  import process from "process";
+import process from "process";
 import pkg from "pg";
 const { Pool } = pkg;
 

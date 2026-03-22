@@ -123,8 +123,9 @@ body {
   cursor: pointer;
   transition: 0.2s;
 }
-.logout{
-  width: 50px;
+.logout {
+  margin: 20px;
+  align-self: flex-start;
 }
 .btn-adicionar:hover {
   transform: translateY(-1px);
