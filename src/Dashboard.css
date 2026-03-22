@@ -1,140 +1,77 @@
-body {
+D/* RESET */
+* {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #f3f4f7;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* DASHBOARD */
+/* CONTAINER */
 .dashboard {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background: #f5f6fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding-bottom: 80px;
 }
 
 /* HEADER */
 .header {
-  padding: 30px 20px;
-  background: linear-gradient(135deg, #ffffff, #eef1ff);
-  border-bottom-left-radius: 25px;
-  border-bottom-right-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  background: linear-gradient(135deg, #efecf3, #8e85a1);
+  color: white;
+  padding: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 .header h1 {
-  margin: 0;
   font-size: 24px;
-  color: #333;
-}
-
-.header h2 {
-  margin-top: 5px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #7b2ff7;
 }
 
 .header p {
   margin-top: 5px;
-  font-size: 25px;
-  font-weight: 700;
-  color: #f73c2f;
+  font-size: 20px;
+  opacity: 0.9;
 }
 
 /* RESUMO */
 .resumo-financeiro {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: space-between;
   margin-top: 20px;
+  gap: 10px;
 }
 
 .resumo-card {
-  background: white;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: 0.2s;
-}
-
-.resumo-card:hover {
-  transform: translateY(-2px);
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
 }
 
 .resumo-card span {
-  font-size: 13px;
-  color: #777;
+  font-size: 12px;
 }
 
 .resumo-card strong {
-  font-size: 20px;
+  display: block;
+  font-size: 16px;
+  margin-top: 5px;
 }
 
-/* CORES */
-.entrada strong {
-  color: #00a86b;
+.resumo-card.entrada {
+  background: #2ecc71;
 }
 
-.saida strong {
-  color: #e53935;
+.resumo-card.saida {
+  background: #e74c3c;
 }
 
-.saldo {
-  background: linear-gradient(135deg, #7b2ff7, #9f44ff);
-  color: white;
-}
-
-.saldo span,
-.saldo strong {
-  color: white;
-}
-
-/* FORM */
-.formulario {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.input-padrao {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  transition: 0.2s;
-}
-
-.input-padrao:focus {
-  border-color: #7b2ff7;
-  outline: none;
-}
-
-/* BOTÃO */
-.btn-adicionar, .logout {
-  background: linear-gradient(135deg, #7b2ff7, #9f44ff);
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.logout{
-  width: 50px;
-}
-.btn-adicionar:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(123,47,247,0.3);
+.resumo-card.saldo {
+  background: #3498db;
 }
 
 /* LISTA */
 .lista-transacoes {
-  flex: 1;
-  overflow-y: auto;
   padding: 20px;
 }
 
@@ -142,29 +79,29 @@ body {
 .cards {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .card-retangulo {
   background: white;
-  padding: 16px;
+  padding: 15px;
   border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  transition: 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.card-retangulo:hover {
-  transform: translateY(-3px);
+.card-retangulo.entrada {
+  border-left: 5px solid #2ecc71;
+}
+
+.card-retangulo.saida {
+  border-left: 5px solid #e74c3c;
 }
 
 /* INFO */
 .info-principal {
   display: flex;
   justify-content: space-between;
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .info-secundaria {
@@ -172,54 +109,135 @@ body {
   justify-content: space-between;
   font-size: 12px;
   color: #777;
+  margin-top: 5px;
 }
 
-/* BOTÃO EXCLUIR */
+/* BOTÃO DELETE */
 .delete {
-  background: #e53935;
+  margin-top: 10px;
+  background: #ff4d4d;
   color: white;
   border: none;
-  padding: 7px 12px;
+  padding: 6px 10px;
   border-radius: 8px;
-  font-size: 13px;
   cursor: pointer;
-  align-self: flex-end;
-  transition: 0.2s;
+  font-size: 12px;
 }
 
-.delete:hover {
-  background: #c62828;
+/* BOTÃO LOGOUT */
+.logout {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #555;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
+/* BOTÃO FLUTUANTE */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #7b2cff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 65px;
+  height: 65px;
+  font-size: 32px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
 
+.fab:hover {
+  transform: scale(1.1);
+}
 
-/* DESKTOP */
-@media (min-width: 768px) {
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CAIXA MODAL */
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: aparecer 0.2s ease;
+}
+
+/* ANIMAÇÃO */
+@keyframes aparecer {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* INPUTS */
+.modal input,
+.modal select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* BOTÕES MODAL */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+  background: #7b2cff;
+  color: white;
+  margin-right: 5px;
+}
+
+.modal-buttons button:last-child {
+  background: #ccc;
+  margin-left: 5px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 600px) {
   .resumo-financeiro {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    flex-direction: column;
   }
 
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-  }
-
-  .formulario {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
-
-  .input-padrao {
-    flex: 1 1 180px;
-    max-width: 220px;
-  }
-
-  .btn-adicionar {
-    flex: 0 0 auto;
+  .header {
+    text-align: center;
   }
 }

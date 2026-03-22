@@ -11,34 +11,30 @@ function Dashboard() {
   const [valor, setValor] = useState("");
   const [tipo, setTipo] = useState("entrada");
 
+  const [mostrarModal, setMostrarModal] = useState(false); // 🔥 NOVO
+
   const token = localStorage.getItem("token");
 
-  // 🔥 HEADER PADRÃO
   const authHeader = {
     Authorization: `Bearer ${token}`,
   };
 
   /* =========================
-     📊 BUSCAR TRANSAÇÕES
+     📊 BUSCAR
   ========================= */
   function buscarTransacoes() {
-    console.log("🔎 Buscando transações...");
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       headers: authHeader,
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Resposta da API (GET /transacoes):", data);
         if (Array.isArray(data)) {
           setTransacoes(data);
         } else {
-          console.error("Erro da API:", data);
           setTransacoes([]);
         }
       })
-      .catch((err) => {
-        console.error("Erro ao buscar transações:", err);
-      });
+      .catch(console.error);
   }
 
   useEffect(() => {
@@ -46,19 +42,10 @@ function Dashboard() {
   }, []);
 
   /* =========================
-     ➕ CRIAR TRANSAÇÃO
+     ➕ CRIAR
   ========================= */
   function criarTransacao(e) {
     e.preventDefault();
-
-    const payload = {
-      descricao,
-      valor: Number(valor),
-      tipo,
-      data,
-    };
-
-    console.log("📤 Enviando nova transação:", payload);
 
     fetch(`${import.meta.env.VITE_API_URL}/transacoes`, {
       method: "POST",
@@ -66,34 +53,32 @@ function Dashboard() {
         "Content-Type": "application/json",
         ...authHeader,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        descricao,
+        valor: Number(valor),
+        tipo,
+        data,
+      }),
     })
       .then((res) => res.json())
-      .then((novaTransacao) => {
-        console.log("✅ Criada:", novaTransacao);
+      .then(() => {
         buscarTransacoes();
         setDescricao("");
         setValor("");
         setData("");
+        setMostrarModal(false); // 🔥 FECHA MODAL
       })
-      .catch((err) => {
-        console.error("Erro ao criar transação:", err);
-      });
+      .catch(console.error);
   }
 
   /* =========================
-     ❌ DELETAR
+     ❌ DELETE
   ========================= */
   function deletarTransacao(id) {
-    console.log("🗑️ Deletando transação:", id);
     fetch(`${import.meta.env.VITE_API_URL}/transacoes/${id}`, {
       method: "DELETE",
       headers: authHeader,
-    })
-      .then(() => buscarTransacoes())
-      .catch((err) => {
-        console.error("Erro ao deletar:", err);
-      });
+    }).then(buscarTransacoes);
   }
 
   /* =========================
@@ -109,16 +94,12 @@ function Dashboard() {
 
   const saldo = entradas - saidas;
 
-  /* =========================
-     🎨 UI
-  ========================= */
   return (
     <div className="dashboard">
       <div className="header">
         <h1>💰 Organizze</h1>
         {usuario && <p>Olá, {usuario.nome}!</p>}
 
-        {/* RESUMO */}
         <div className="resumo-financeiro">
           <div className="resumo-card entrada">
             <span>Receitas</span>
@@ -136,44 +117,6 @@ function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* FORM */}
-      <form onSubmit={criarTransacao} className="formulario">
-        <input
-          className="input-padrao"
-          placeholder="Descrição"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          required
-        />
-
-        <input
-          className="input-padrao"
-          type="date"
-          value={data}
-          onChange={(e) => setData(e.target.value)}
-          required
-        />
-
-        <input
-          className="input-padrao"
-          placeholder="Valor"
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-          required
-        />
-
-        <select
-          className="input-padrao"
-          value={tipo}
-          onChange={(e) => setTipo(e.target.value)}
-        >
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
-        </select>
-
-        <button className="btn-adicionar">Adicionar</button>
-      </form>
 
       {/* LISTA */}
       <div className="lista-transacoes">
@@ -200,6 +143,57 @@ function Dashboard() {
           ))}
         </div>
       </div>
+
+      {/* 🔥 BOTÃO FLUTUANTE */}
+      <button className="fab" onClick={() => setMostrarModal(true)}>
+        +
+      </button>
+
+      {/* 🔥 MODAL */}
+      {mostrarModal && (
+        <div className="modal-overlay">
+          <form className="modal" onSubmit={criarTransacao}>
+            <h2>Nova Transação</h2>
+
+            <input
+              placeholder="Descrição"
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+              required
+            />
+
+            <input
+              type="number"
+              placeholder="Valor"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              required
+            />
+
+            <input
+              type="date"
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              required
+            />
+
+            <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+
+            <div className="modal-buttons">
+              <button type="submit">Adicionar</button>
+              <button
+                type="button"
+                onClick={() => setMostrarModal(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <button onClick={logout} className="logout">
         Sair
