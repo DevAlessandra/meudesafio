@@ -103,17 +103,17 @@ function Dashboard() {
         <div className="resumo-financeiro">
           <div className="resumo-card entrada">
             <span>Receitas</span>
-            <strong>R$ {entradas}</strong>
+            <strong>R$ {entradas.toFixed(2)}</strong>
           </div>
 
           <div className="resumo-card saida">
             <span>Despesas</span>
-            <strong>R$ {saidas}</strong>
+            <strong>R$ {saidas.toFixed(2)}</strong>
           </div>
 
           <div className="resumo-card saldo">
             <span>Saldo Total</span>
-            <strong>R$ {saldo}</strong>
+            <strong>R$ {saldo.toFixed(2)}</strong>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@ function Dashboard() {
             <div key={t.id} className={`card-retangulo ${t.tipo}`}>
               <div className="info-principal">
                 <span>{t.descricao}</span>
-                <span>R$ {t.valor}</span>
+                <span>R$ {Number(t.valor).toFixed(2)}</span>
               </div>
 
               <div className="info-secundaria">

@@ -1,16 +1,18 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./logincss.css";
 
 function Cadastro() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,7 +24,7 @@ function Cadastro() {
 
       if (res.ok) {
         alert("Conta criada com sucesso!");
-        window.location.href = "/login";
+        navigate("/login");
       } else {
         alert(data.erro || "Erro ao cadastrar");
       }
@@ -67,7 +69,7 @@ function Cadastro() {
           </form>
 
           <p style={{ marginTop: "10px" }}>
-            Já tem conta? <a href="/login">Entrar</a>
+            Já tem conta? <Link to="/login">Entrar</Link>
           </p>
         </div>
 
