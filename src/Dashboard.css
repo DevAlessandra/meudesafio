@@ -66,10 +66,6 @@
   background: #e74c3c;
 }
 
-<<<<<<< HEAD
-.resumo-card.saldo {
-  background: #3498db;
-=======
 .saldo {
   background: linear-gradient(135deg, #7b2ff7, #9f44ff);
   color: white;
@@ -119,7 +115,6 @@
 .btn-adicionar:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(123,47,247,0.3);
->>>>>>> 5a754a2cc9efe212e6c4d8943e47b128bebc824e
 }
 
 /* LISTA */
