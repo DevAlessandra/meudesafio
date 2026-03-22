@@ -15,8 +15,8 @@
 
 /* HEADER */
 .header {
-  background: linear-gradient(135deg, #efecf3, #8e85a1);
-  color: white;
+  background: linear-gradient(135deg, #efecf3, #dfd9ec);
+  color: rgb(126, 123, 123);
   padding: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
